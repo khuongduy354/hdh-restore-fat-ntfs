@@ -1,0 +1,88 @@
+Jump Boot: ÎXêmkfs.fat
+OEM Name: mkfs.fat
+Bytes Per Sector: 512
+Sectors Per Cluster: 
+Reserved Sectors: 32
+Number of FATs: 
+Root Entries: 0
+Total Sectors 16: 0
+Media Descriptor: ¯
+Sectors Per FAT 16: 0
+Sectors Per Track: 32
+Number of Heads: 8
+Hidden Sectors: 0
+Total Sectors 32: 122880
+Sectors Per FAT 32: 945
+Flags: 0
+FAT Version: 0
+Root Cluster: 2
+FS Info Sector: 1
+Backup Boot Sector: 6
+Reserved: 
+Drive Number: Ä
+Reserved 1: 
+Boot Signature: )
+Volume ID: 863214985
+Volume Label: NO NAME    FAT32   æw|¨"¿tV¥ª
+FS Type: FAT32   æw|¨"¿tV¥ª
+Boot Code: æw|¨"¿tV¥ª
+Boot Sector Signature: 43605
+Filename: Ât
+Attributes: f
+File Size: 4294967295 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: ÂEST    TXT 
+Attributes: 20
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Filename: 
+Attributes: 0
+File Size: 0 bytes
+First Cluster Low: 0
+First Cluster High: 0
+Deleted Files:
+Ât
+  File Size: 4294967295 bytes
+  First Cluster Low: 0
+  First Cluster High: 0
+ÂEST    TXT 
+  File Size: 0 bytes
+  First Cluster Low: 0
+  First Cluster High: 0

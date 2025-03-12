@@ -41,39 +41,6 @@ struct FAT32BootSector
   uint16_t bootSectorSignature;
 };
 
-void printBootSector(FAT32BootSector i)
-{
-  cout << "Jump Boot: " << i.jumpBoot << endl;
-  cout << "OEM Name: " << i.oemName << endl;
-  cout << "Bytes Per Sector: " << i.bytesPerSector << endl;
-  cout << "Sectors Per Cluster: " << i.sectorsPerCluster << endl;
-  cout << "Reserved Sectors: " << i.reservedSectors << endl;
-  cout << "Number of FATs: " << i.numFATs << endl;
-  cout << "Root Entries: " << i.rootEntries << endl;
-  cout << "Total Sectors 16: " << i.totalSectors16 << endl;
-  cout << "Media Descriptor: " << i.mediaDescriptor << endl;
-  cout << "Sectors Per FAT 16: " << i.sectorsPerFAT16 << endl;
-  cout << "Sectors Per Track: " << i.sectorsPerTrack << endl;
-  cout << "Number of Heads: " << i.numHeads << endl;
-  cout << "Hidden Sectors: " << i.hiddenSectors << endl;
-  cout << "Total Sectors 32: " << i.totalSectors32 << endl;
-  cout << "Sectors Per FAT 32: " << i.sectorsPerFAT32 << endl;
-  cout << "Flags: " << i.flags << endl;
-  cout << "FAT Version: " << i.fatVersion << endl;
-  cout << "Root Cluster: " << i.rootCluster << endl;
-  cout << "FS Info Sector: " << i.fsInfoSector << endl;
-  cout << "Backup Boot Sector: " << i.backupBootSector << endl;
-  cout << "Reserved: " << i.reserved << endl;
-  cout << "Drive Number: " << i.driveNumber << endl;
-  cout << "Reserved 1: " << i.reserved1 << endl;
-  cout << "Boot Signature: " << i.bootSignature << endl;
-  cout << "Volume ID: " << i.volumeID << endl;
-  cout << "Volume Label: " << i.volumeLabel << endl;
-  cout << "FS Type: " << i.fsType << endl;
-  cout << "Boot Code: " << i.bootCode << endl;
-  cout << "Boot Sector Signature: " << i.bootSectorSignature << endl;
-}
-
 struct FAT32DirectoryEntry
 {
   char filename[8];
@@ -112,6 +79,48 @@ std::string getFilename(const FAT32DirectoryEntry &entry)
     filename += "." + extension;
   }
   return filename;
+}
+
+void printEntry(FAT32DirectoryEntry entry)
+{
+  cout << "Filename: " << entry.filename << endl;
+  cout << "Attributes: " << hex << (int)entry.attributes << dec << endl;
+  cout << "File Size: " << entry.fileSize << " bytes" << endl;
+  cout << "First Cluster Low: " << entry.firstClusterLow << endl;
+  cout << "First Cluster High: " << entry.firstClusterHigh << endl;
+}
+
+void printBootSector(FAT32BootSector i)
+{
+  cout << "Jump Boot: " << i.jumpBoot << endl;
+  cout << "OEM Name: " << i.oemName << endl;
+  cout << "Bytes Per Sector: " << i.bytesPerSector << endl;
+  cout << "Sectors Per Cluster: " << i.sectorsPerCluster << endl;
+  cout << "Reserved Sectors: " << i.reservedSectors << endl;
+  cout << "Number of FATs: " << i.numFATs << endl;
+  cout << "Root Entries: " << i.rootEntries << endl;
+  cout << "Total Sectors 16: " << i.totalSectors16 << endl;
+  cout << "Media Descriptor: " << i.mediaDescriptor << endl;
+  cout << "Sectors Per FAT 16: " << i.sectorsPerFAT16 << endl;
+  cout << "Sectors Per Track: " << i.sectorsPerTrack << endl;
+  cout << "Number of Heads: " << i.numHeads << endl;
+  cout << "Hidden Sectors: " << i.hiddenSectors << endl;
+  cout << "Total Sectors 32: " << i.totalSectors32 << endl;
+  cout << "Sectors Per FAT 32: " << i.sectorsPerFAT32 << endl;
+  cout << "Flags: " << i.flags << endl;
+  cout << "FAT Version: " << i.fatVersion << endl;
+  cout << "Root Cluster: " << i.rootCluster << endl;
+  cout << "FS Info Sector: " << i.fsInfoSector << endl;
+  cout << "Backup Boot Sector: " << i.backupBootSector << endl;
+  cout << "Reserved: " << i.reserved << endl;
+  cout << "Drive Number: " << i.driveNumber << endl;
+  cout << "Reserved 1: " << i.reserved1 << endl;
+  cout << "Boot Signature: " << i.bootSignature << endl;
+  cout << "Volume ID: " << i.volumeID << endl;
+  cout << "Volume Label: " << i.volumeLabel << endl;
+  cout << "FS Type: " << i.fsType << endl;
+  cout << "Boot Code: " << i.bootCode << endl;
+  cout << "Boot Sector Signature: " << i.bootSectorSignature << endl;
 }
 
 int main(int argc, char *argv[])
@@ -154,10 +163,16 @@ int main(int argc, char *argv[])
   disk.seekg(rootDirectorySector * bootSector.bytesPerSector);
 
   FAT32DirectoryEntry entry;
-  char sample[20];
-  while (disk.read(sample, 20))
+  int entries_lim = 10;
+  int entries_count = 0;
+
+  while (disk.read(reinterpret_cast<char *>(&entry), sizeof(entry)))
   {
-    std::cout << sample << endl;
+    if (entries_count == entries_lim)
+      break;
+    entries_count++;
+    printEntry(entry);
+
     if (isDeletedEntry(entry))
     {
       deletedEntries.push_back(entry);
@@ -173,7 +188,7 @@ int main(int argc, char *argv[])
   std::cout << "Deleted Files:" << std::endl;
   for (const auto &deletedEntry : deletedEntries)
   {
-    std::cout << getFilename(deletedEntry) << std::endl;
+    std::cout << deletedEntry.filename << std::endl;
     std::cout << "  File Size: " << deletedEntry.fileSize << " bytes"
               << std::endl;
     std::cout << "  First Cluster Low: " << deletedEntry.firstClusterLow
@@ -183,16 +198,21 @@ int main(int argc, char *argv[])
 
     // basic attempt at recovering. This is not a proper recovery and often will
     // not work.
-    if (deletedEntry.fileSize > 0 && deletedEntry.firstClusterLow > 1)
+    bool cond = deletedEntry.fileSize > 0 && deletedEntry.firstClusterLow > 1;
+    if (cond)
     {
+      cout << "  Attempting recovery..." << endl;
       uint32_t cluster = deletedEntry.firstClusterLow;
       uint32_t sector =
           firstDataSector + (cluster - 2) * bootSector.sectorsPerCluster;
-      std::string recoveredFilename = "recovered_" + getFilename(deletedEntry);
+
+      string filename = deletedEntry.filename;
+      std::string recoveredFilename = "recovered_" + filename;
       std::ofstream recoveredFile(recoveredFilename, std::ios::binary);
 
       if (recoveredFile.is_open())
       {
+        cout << "  Recovered file: " << recoveredFilename << endl;
         disk.seekg(sector * bootSector.bytesPerSector);
         std::vector<char> buffer(bytesPerCluster);
         uint32_t bytesRemaining = deletedEntry.fileSize;
