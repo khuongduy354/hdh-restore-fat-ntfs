@@ -1,18 +1,18 @@
 Jump Boot: ëXmkfs.fat
 OEM Name: mkfs.fat
 Bytes Per Sector: 512
-Sectors Per Cluster: 
+Sectors Per Cluster: 1
 Reserved Sectors: 32
 Number of FATs: 
 Root Entries: 0
-Total Sectors 16: 0
+Total Sectors 16: 20480
 Media Descriptor: ø
 Sectors Per FAT 16: 0
 Sectors Per Track: 32
-Number of Heads: 8
+Number of Heads: 2
 Hidden Sectors: 0
-Total Sectors 32: 122880
-Sectors Per FAT 32: 945
+Total Sectors 32: 0
+Sectors Per FAT 32: 158
 Flags: 0
 FAT Version: 0
 Root Cluster: 2
@@ -22,67 +22,25 @@ Reserved:
 Drive Number: €
 Reserved 1: 
 Boot Signature: )
-Volume ID: 863214985
+Volume ID: 155075101
 Volume Label: NO NAME    FAT32   ¾w|¬"ÀtV´»
 FS Type: FAT32   ¾w|¬"ÀtV´»
 Boot Code: ¾w|¬"ÀtV´»
 Boot Sector Signature: 43605
-Filename: åt
-Attributes: f
-File Size: 4294967295 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: åEST    TXT 
-Attributes: 20
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
-Filename: 
-Attributes: 0
-File Size: 0 bytes
-First Cluster Low: 0
-First Cluster High: 0
+348
 Deleted Files:
-åt
-  File Size: 4294967295 bytes
-  First Cluster Low: 0
+An entry
+An entry
+An entry
+An entry
+  filename: åEST    TXT 
+  File Size: 8 bytes
+  First Cluster Low: 11
   First Cluster High: 0
-åEST    TXT 
-  File Size: 0 bytes
-  First Cluster Low: 0
-  First Cluster High: 0
+  Attempting recovery for file with size > 0 and first cluster low > 1...
+data at byte: 182784
+512
+Bytes to read: 8
+Data: dsafads
+
+  Attempted recovery to: recovered_something

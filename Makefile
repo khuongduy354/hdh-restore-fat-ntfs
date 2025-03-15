@@ -3,8 +3,8 @@ TEST_IMAGE := ./test.img
 MOUNT_POINT := /mnt/test
 # create a 10MB image
 # format the image as FAT32
-run_full_flow:
-	dd if=/dev/zero of=test.img bs=1M count=60
+setup_test_image_with_deleted_file:
+	dd if=/dev/zero of=test.img bs=1M count=10
 	mkfs.vfat -F 32 test.img 
 	sudo mkdir -p /mnt/test
 
@@ -15,34 +15,22 @@ run_full_flow:
 	fi
 
 
-	# 
-	# 
-	# create edited text file
-	echo "hi, i'm duy" | sudo tee /mnt/test/test.txt > /dev/null 
-	#
-	# showing the file in the mounted image
-	sudo cat /mnt/test/test.txt
-	#
-	#
-	# now remove it 
-	sudo rm /mnt/test/test.txt 
-	#
-	# it should disappear
-	sudo ls /mnt/test	 
-	#
-	#
+	#sudo vi /mnt/test/test.txt
+	# sudo rm /mnt/test/test.txt
+
+
+
+restore: 
 	# try restore
 	./restore.out ./test.img > output.txt
 	#
 	#
 	# it should be back.
 	sudo ls /mnt/test	 
-	# 
-	# 
-	# 
-	sudo umount /mnt/test
 
 
+print_hex:
+	xxd -l 3000000 ./test.img > hex.txt 
 
 
 create_test_img: 
