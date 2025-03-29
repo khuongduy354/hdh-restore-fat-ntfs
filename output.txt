@@ -22,25 +22,24 @@ Reserved:
 Drive Number: €
 Reserved 1: 
 Boot Signature: )
-Volume ID: 155075101
+Volume ID: 380297049
 Volume Label: NO NAME    FAT32   ¾w|¬"ÀtV´»
 FS Type: FAT32   ¾w|¬"ÀtV´»
 Boot Code: ¾w|¬"ÀtV´»
 Boot Sector Signature: 43605
-348
+First data sector: 348
+FAT table start at sector: 32
+Restore at byte: 178176
+Restore at byte: 178208
 Deleted Files:
-An entry
-An entry
-An entry
-An entry
   filename: åEST    TXT 
   File Size: 8 bytes
-  First Cluster Low: 11
+  First Cluster Low: 3
   First Cluster High: 0
   Attempting recovery for file with size > 0 and first cluster low > 1...
-data at byte: 182784
+data at byte: 178688
 512
 Bytes to read: 8
-Data: dsafads
+Data: asdfdas
 
   Attempted recovery to: recovered_something

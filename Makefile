@@ -15,8 +15,10 @@ setup_test_image_with_deleted_file:
 	fi
 
 
-	#sudo vi /mnt/test/test.txt
-	# sudo rm /mnt/test/test.txt
+	sudo vi -n /mnt/test/test.txt
+	# sudo rm /mnt/test/test.txt 
+
+	ls /mnt/test/
 
 
 
@@ -24,7 +26,11 @@ restore:
 	# try restore
 	./restore.out ./test.img > output.txt
 	#
-	#
+	# 
+
+	# remount 
+	sudo umount /mnt/test 
+	sudo mount -o loop test.img /mnt/test
 	# it should be back.
 	sudo ls /mnt/test	 
 

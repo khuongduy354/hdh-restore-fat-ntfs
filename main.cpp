@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  std::ifstream disk(argv[1], std::ios::binary);
+  std::fstream disk(argv[1], std::ios::in | std::ios::out | std::ios::binary);
   if (!disk.is_open())
   {
     std::cerr << "Error opening disk image: " << argv[1] << std::endl;
@@ -193,7 +193,8 @@ int main(int argc, char *argv[])
 
   disk.seekg(rootDirectorySector * bootSector.bytesPerSector);
 
-  cout << firstDataSector << endl;
+  cout << "First data sector: " << firstDataSector << endl;
+  cout << "FAT table start at sector: " << bootSector.reservedSectors << endl;
 
   FAT32DirectoryEntry entry;
   int entries_lim = 10;
@@ -210,12 +211,12 @@ int main(int argc, char *argv[])
       // Write the modified directory entry back to disk
       deletedEntries.push_back(entry);
 
-      // int entryOffset = entries_count * sizeof(entry);
-      // int entrySector = rootDirectorySector * bootSector.bytesPerSector + entryOffset;
-      // disk.seekp(entrySector); // Assuming 512-byte sectors
-      // entry.filename[0] = 0x00;
-      // disk.write(reinterpret_cast<char *>(&entry), sizeof(entry));
-      // cout << "Restore at sector: " << entrySector << endl;
+      int entryOffset = entries_count * sizeof(entry);
+      int entrySector = rootDirectorySector * bootSector.bytesPerSector + entryOffset;
+      disk.seekp(entrySector); // Assuming 512-byte sectors
+      entry.filename[0] = 0x6e;
+      disk.write(reinterpret_cast<char *>(&entry), sizeof(entry));
+      cout << "Restore at byte: " << entrySector << endl;
     }
     else if (entry.filename[0] != 0x00 &&
              entry.filename[0] !=
@@ -243,7 +244,6 @@ int main(int argc, char *argv[])
   std::cout << "Deleted Files:" << std::endl;
   for (const auto &deletedEntry : deletedEntries)
   {
-    cout << "An entry" << endl;
     bool cond = deletedEntry.fileSize > 0 && deletedEntry.firstClusterLow > 1;
 
     if (cond)
