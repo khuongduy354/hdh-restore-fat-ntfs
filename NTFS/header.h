@@ -137,5 +137,5 @@ bool IsValidFile(uint32_t flags);
 vector<DataRun> ParseDataRuns(uint8_t* dataRunPtr);
 vector<uint8_t> ReadNonResidentData(const char* diskPath, const vector<DataRun>& dataRuns, uint64_t fileSize);
 void ParseAttributes(uint8_t* mftRecord, size_t recordSize, vector<FileInfo> &file_list, const char* disk_path);
-vector<FileInfo> listMFTRecords(const char* disk_path, const vector<uint8_t>& buffer, int maxEntries = 50);
+vector<FileInfo> listMFTRecords(const char* disk_path, const vector<uint8_t>& buffer, int maxEntries = 1000);
 bool RecoverFile(const FileInfo& fileInfo, const wstring& outputDir);
