@@ -65,22 +65,6 @@ bool isDeletedEntry(const FAT32DirectoryEntry &entry)
   return (uint8_t)entry.filename[0] == 0xE5;
 }
 
-std::string getFilename(const FAT32DirectoryEntry &entry)
-{
-  std::string filename(entry.filename, 8);
-  filename.erase(std::find(filename.begin(), filename.end(),
-                           ' ')); // Remove trailing spaces
-  std::string extension(entry.extension, 3);
-  extension.erase(std::find(extension.begin(), extension.end(),
-                            ' ')); // Remove trailing spaces
-
-  if (!extension.empty())
-  {
-    filename += "." + extension;
-  }
-  return filename;
-}
-
 void printEntry(FAT32DirectoryEntry entry)
 {
   cout << "Filename: " << entry.filename << endl;
@@ -124,7 +108,9 @@ void printBootSector(FAT32BootSector i)
   cout << "Boot Sector Signature: " << i.bootSectorSignature << endl;
 }
 
-void printDataAtEntry(FAT32DirectoryEntry deletedEntry, std::fstream &disk, FAT32BootSector bootSector, uint32_t firstDataSector, uint32_t bytesPerCluster)
+void printDataAtEntry(FAT32DirectoryEntry deletedEntry, std::fstream &disk,
+                      FAT32BootSector bootSector, uint32_t firstDataSector,
+                      uint32_t bytesPerCluster)
 {
   uint32_t cluster = deletedEntry.firstClusterLow;
   uint32_t sector =
@@ -137,8 +123,7 @@ void printDataAtEntry(FAT32DirectoryEntry deletedEntry, std::fstream &disk, FAT3
 
   // while (bytesRemaining > 0)
   // {
-  uint32_t bytesToRead =
-      std::min((uint32_t)buffer.size(), bytesRemaining);
+  uint32_t bytesToRead = std::min((uint32_t)buffer.size(), bytesRemaining);
   disk.read(buffer.data(), bytesToRead);
   // bytesRemaining -= bytesToRead;
   cluster = 0; // In a real recovery, you would read the FAT to find the
@@ -200,10 +185,6 @@ int main(int argc, char *argv[])
   int entries_lim = 10;
   int entries_count = 0;
 
-  // char *b = new char[512];
-  // disk.read(b, 512);
-  // cout <<
-
   while (disk.read(reinterpret_cast<char *>(&entry), sizeof(entry)))
   {
     if (isDeletedEntry(entry))
@@ -212,7 +193,8 @@ int main(int argc, char *argv[])
       deletedEntries.push_back(entry);
 
       int entryOffset = entries_count * sizeof(entry);
-      int entrySector = rootDirectorySector * bootSector.bytesPerSector + entryOffset;
+      int entrySector =
+          rootDirectorySector * bootSector.bytesPerSector + entryOffset;
       disk.seekp(entrySector); // Assuming 512-byte sectors
       entry.filename[0] = 0x6e;
       disk.write(reinterpret_cast<char *>(&entry), sizeof(entry));
@@ -221,7 +203,8 @@ int main(int argc, char *argv[])
     else if (entry.filename[0] != 0x00 &&
              entry.filename[0] !=
                  0x2E)
-    { // 0x00 is end of directory, 0x2E is . or ..
+    {
+      // 0x00 = end of directory, 0x2E is . or ..
       entries.push_back(entry);
     }
 
@@ -229,35 +212,22 @@ int main(int argc, char *argv[])
   }
   disk.clear();
 
-  // for (auto &entry : entries)
-  //   if (true)
-  //   {
-  //     cout << "FAT table start at line: " << bootSector.reservedSectors * bootSector.bytesPerSector / 16 << endl;
-  //     cout << "DATA start at line: " << firstDataSector * bootSector.bytesPerSector / 16 << endl;
-  //     cout << "  Filename: " << entry.filename << endl;
-  //     cout << "  File Size: " << entry.fileSize << " bytes" << endl;
-  //     cout << "  First Cluster Low: " << entry.firstClusterLow << endl;
-  //     cout << "  First Cluster High: " << entry.firstClusterHigh << endl;
-  //     printDataAtEntry(entry, disk, bootSector, firstDataSector, bytesPerCluster);
-  //   }
-
   std::cout << "Deleted Files:" << std::endl;
   for (const auto &deletedEntry : deletedEntries)
   {
-    bool cond = deletedEntry.fileSize > 0 && deletedEntry.firstClusterLow > 1;
+    bool shouldRestore = deletedEntry.fileSize > 0 && deletedEntry.firstClusterLow > 1;
 
-    if (cond)
+    if (shouldRestore)
     {
       cout << "  filename: " << deletedEntry.filename << endl;
       cout << "  File Size: " << deletedEntry.fileSize << " bytes" << endl;
       cout << "  First Cluster Low: " << deletedEntry.firstClusterLow << endl;
       cout << "  First Cluster High: " << deletedEntry.firstClusterHigh << endl;
-      cout << "  Attempting recovery for file with size > 0 and first cluster low > 1..." << endl;
       uint32_t cluster = deletedEntry.firstClusterLow;
       uint32_t sector =
           firstDataSector + (cluster - 2) * bootSector.sectorsPerCluster;
 
-      string filename = "something";
+      string filename = deletedEntry.filename;
       std::string recoveredFilename = "recovered_" + filename;
       std::ofstream recoveredFile(recoveredFilename, std::ios::binary);
 
@@ -265,33 +235,14 @@ int main(int argc, char *argv[])
       {
 
         int bytepos = sector * bootSector.bytesPerSector;
-        cout << "data at byte: " << bytepos << endl;
 
-        cout << bytesPerCluster << endl;
         std::vector<char> buffer(bytesPerCluster);
-        uint32_t bytesRemaining = deletedEntry.fileSize;
 
-        while (bytesRemaining > 0)
-        {
-          uint32_t bytesToRead =
-              std::min((uint32_t)buffer.size(), bytesRemaining);
-          cout << "Bytes to read: " << bytesToRead << endl;
-          disk.seekg(bytepos);
-          disk.read(buffer.data(), bytesToRead);
-          recoveredFile.write(buffer.data(), bytesToRead);
-          cout << "Data: " << buffer.data() << endl;
-          break;
-          bytesRemaining -= bytesToRead;
-          cluster = 0; // In a real recovery, you would read the FAT to find the
-                       // next cluster.
-          if (cluster < 2)
-          {
-            break; // stop if no more clusters.
-          }
-          sector =
-              firstDataSector + (cluster - 2) * bootSector.sectorsPerCluster;
-          disk.seekg(sector * bootSector.bytesPerSector);
-        }
+        uint32_t bytesToRead = (uint32_t)buffer.size();
+        disk.seekg(bytepos);
+        disk.read(buffer.data(), bytesToRead);
+        recoveredFile.write(buffer.data(), bytesToRead);
+
         std::cout << "  Attempted recovery to: " << recoveredFilename
                   << std::endl;
       }
